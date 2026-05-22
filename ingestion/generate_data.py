@@ -905,7 +905,7 @@ def main():
           f"{counts['prior_auth']} auth | {counts['denial']} denial | {counts['appeal']} appeal")
     print(f"  JSON (FHIR)   : {counts['fhir']} patient records")
     print(f"  TXT           : {counts['case_note']} case manager notes")
-    print(f"  CSV           : 3 export files")
+    print("  CSV           : 3 export files")
     print(f"  Total files   : {sum(counts.values()) + 3:,}")
     print("=" * 60)
 
