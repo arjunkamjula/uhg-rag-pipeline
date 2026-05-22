@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: uhg-rag-config
+  namespace: uhg-ai
+data:
+  mlflow-uri: "http://mlflow-service:5000"
+  pinecone-index: "uhg-claims-rag"
+  environment: "production"

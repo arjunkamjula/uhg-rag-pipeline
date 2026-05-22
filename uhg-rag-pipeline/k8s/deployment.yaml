@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: uhg-rag-api
+  namespace: uhg-ai
+  labels:
+    app: uhg-rag-api
+    team: ai-engineering
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: uhg-rag-api
+  template:
+    metadata:
+      labels:
+        app: uhg-rag-api
+    spec:
+      containers:
+        - name: uhg-rag-api
+          image: uhg-rag-pipeline:latest
+          ports:
+            - containerPort: 8000
+          env:
+            - name: ENVIRONMENT
+              value: "production"
+            - name: LLM_PROVIDER
+              value: "groq"
+            - name: TRANSFORMERS_OFFLINE
+              value: "1"
+            - name: HF_HUB_OFFLINE
+              value: "1"
+            - name: PINECONE_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: uhg-rag-secrets
+                  key: pinecone-api-key
+            - name: GROQ_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: uhg-rag-secrets
+                  key: groq-api-key
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: uhg-rag-secrets
+                  key: database-url
+            - name: MLFLOW_TRACKING_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: uhg-rag-config
+                  key: mlflow-uri
+            - name: PINECONE_INDEX_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: uhg-rag-config
+                  key: pinecone-index
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "2Gi"
+              cpu: "1000m"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            failureThreshold: 3
